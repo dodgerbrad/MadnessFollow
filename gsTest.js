@@ -13,6 +13,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     const urlParams = new URLSearchParams(window.location.search);
     const master = urlParams.get('master') || "Default";
 
+    // --- CRITICAL IPHONE FIX: Update Canonical Link ---
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+        canonical = document.createElement('link');
+        canonical.rel = 'canonical';
+        document.head.appendChild(canonical);
+    }
+    // This tells Safari: "The official version of this page IS the one with the parameter."
+    canonical.href = window.location.href; 
+
     // 3. UPDATE UI HEADER
     if (dMast) {
         dMast.textContent = `${master}'s Draft`;
