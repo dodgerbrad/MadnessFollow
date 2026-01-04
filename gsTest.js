@@ -1,29 +1,27 @@
 let allTeams = [];
 
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log("2026 Draft App Initializing..."); // This MUST show up first
     const dMast = document.getElementById('dMast');
     const urlParams = new URLSearchParams(window.location.search);
     const master = urlParams.get('master') || "Default";
 
     dMast.textContent = `${master}'s Draft`;
 
-    const url = `docs.google.com`;
+    // MUST start with https:// and end with a cache-buster for 2026
+    const url = `docs.google.com{Date.now()}`;
 
     try {
         const res = await fetch(url);
         const csvText = await res.text();
 
-        // 1. Split rows and clean hidden characters (\r) from every cell
-        const rows = csvText.split(/\r?\n/).map(row => 
-            row.split(',').map(cell => cell.replace(/^"(.*)"$/, '$1').trim())
-        );
+        // Split by line, then clean each cell of quotes and hidden characters
+        const allRows = csvText.split(/\r?\n/).filter(row => row.trim() !== "");
+        const rows = allRows.map(row => row.split(',').map(cell => cell.replace(/^"(.*)"$/, '$1').trim()));
 
-        // 2. Sanitize Headers (removes hidden junk like \r from "LogoURL\r")
+        // SANITIZE HEADERS: This fixes the "8 headers" issue by removing hidden characters
         const headers = rows[0].map(h => h.replace(/[\r\n]/g, '').trim());
         console.log("Final Sanity Check - Headers found:", headers);
 
-        // 3. Build allTeams objects
         allTeams = rows.slice(1).map(row => {
             let obj = {};
             row.forEach((val, i) => {
