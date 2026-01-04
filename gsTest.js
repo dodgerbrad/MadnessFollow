@@ -1,13 +1,14 @@
 let allTeams = [];
 
 document.addEventListener('DOMContentLoaded', async () => {
+    console.log("2026 Draft App Initializing..."); // This MUST show up first
     const dMast = document.getElementById('dMast');
     const urlParams = new URLSearchParams(window.location.search);
     const master = urlParams.get('master') || "Default";
 
     dMast.textContent = `${master}'s Draft`;
 
-    const url = `https://docs.google.com/spreadsheets/d/e/2PACX-1vSqMpZdzLDdyKl1HqHtx4t_UUpJx6F7I4JhOGD5JhSyMFq9xY11Psl-HFrpPMBZzKh1efH074NOlz5B/pub?gid=1466103352&single=true&output=csv`;
+    const url = `docs.google.com`;
 
     try {
         const res = await fetch(url);
@@ -18,8 +19,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             row.split(',').map(cell => cell.replace(/^"(.*)"$/, '$1').trim())
         );
 
-        // 2. Sanitize Headers specifically (removes any remaining hidden junk)
+        // 2. Sanitize Headers (removes hidden junk like \r from "LogoURL\r")
         const headers = rows[0].map(h => h.replace(/[\r\n]/g, '').trim());
+        console.log("Final Sanity Check - Headers found:", headers);
 
         // 3. Build allTeams objects
         allTeams = rows.slice(1).map(row => {
@@ -30,13 +32,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             return obj;
         }).filter(item => item.draftMaster === master);
 
-        console.log("Verified Headers:", headers); // Check your console to see if LogoURL is there
-        console.log("First Team Data:", allTeams[0]); // Check if logoURL has a value
-
+        console.log("Teams Loaded:", allTeams.length);
         renderAll();
     } catch (err) {
-        console.error("Load Error:", err);
-        dMast.textContent = "Error Loading Sheet";
+        console.error("Critical Load Error:", err);
+        dMast.textContent = "Error Loading Sheet Data";
     }
 });
 
