@@ -5,6 +5,7 @@ body {
   margin: 0;
   padding: 15px;
   -webkit-font-smoothing: antialiased;
+  overscroll-behavior-y: contain; 
 }
 
 h2,
