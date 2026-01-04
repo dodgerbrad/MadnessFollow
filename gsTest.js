@@ -27,25 +27,30 @@ document.addEventListener('DOMContentLoaded', async () => {
     currentFullURL.searchParams.set('master', master);
     const baseUrl = currentFullURL.origin + currentFullURL.pathname.substring(0, currentFullURL.pathname.lastIndexOf('/') + 1);
 
-    const dynamicManifest = {
-        "short_name": `Draft-${master}`,
-        "name": `${master}'s 2026 Draft Board`,
-        "start_url": currentFullURL.toString(), // Uses the full, explicit URL
-        "display": "standalone",
-        "background_color": "#0d1117",
-        "theme_color": "#58a6ff",
-        "icons": [
-            { "src": `${baseUrl}2026 Logo.png`, "sizes": "192x192", "type": "image/png" },
-            { "src": `${baseUrl}2026 Logo.png`, "sizes": "512x512", "type": "image/png" }
-        ]
-    };
-    const stringManifest = JSON.stringify(dynamicManifest);
-    const blob = new Blob([stringManifest], { type: 'application/json' });
-    const manifestURL = URL.createObjectURL(blob);
-    const link = document.createElement('link');
-    link.rel = 'manifest';
-    link.href = manifestURL;
-    document.head.appendChild(link);
+   // Replace your Step 4 Blob logic with this:
+const dynamicManifest = {
+    "short_name": `Draft-${master}`,
+    "name": `${master}'s 2026 Draft Board`,
+    "start_url": window.location.href, // Explicitly uses the full current URL
+    "display": "standalone",
+    "background_color": "#0d1117",
+    "theme_color": "#58a6ff",
+    "icons": [
+        { "src": `${baseUrl}2026 Logo.png`, "sizes": "192x192", "type": "image/png" },
+        { "src": `${baseUrl}2026 Logo.png`, "sizes": "512x512", "type": "image/png" }
+    ]
+};
+
+// Encode the manifest as a Base64 string for better iOS 26 support
+const manifestString = JSON.stringify(dynamicManifest);
+const manifestBase64 = btoa(unescape(encodeURIComponent(manifestString)));
+const manifestURL = `data:application/json;base64,${manifestBase64}`;
+
+const link = document.createElement('link');
+link.rel = 'manifest';
+link.href = manifestURL;
+document.head.appendChild(link);
+
 
     // 5. FETCH DATA FROM GOOGLE APPS SCRIPT
     // Replace the URL with your current Web App URL
