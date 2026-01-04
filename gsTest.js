@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     dMast.textContent = `${master}'s Draft`;
 
     // MUST start with https:// and end with a cache-buster for 2026
-    const url = `https://docs.google.com/spreadsheets/d/e/2PACX-1vSqMpZdzLDdyKl1HqHtx4t_UUpJx6F7I4JhOGD5JhSyMFq9xY11Psl-HFrpPMBZzKh1efH074NOlz5B/pubhtml?gid=0&single=true{Date.now()}`;
+    const url = `https://docs.google.com/spreadsheets/d/e/2PACX-1vSqMpZdzLDdyKl1HqHtx4t_UUpJx6F7I4JhOGD5JhSyMFq9xY11Psl-HFrpPMBZzKh1efH074NOlz5B/pubhtml?gid=0&single=true`;
 
     try {
         const res = await fetch(url);
