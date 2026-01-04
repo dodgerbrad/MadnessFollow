@@ -7,28 +7,36 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     dMast.textContent = `${master}'s Draft`;
 
-    // REPLACE THIS with your actual Published CSV link
-    const SHEET_ID = '1pLOuB4Z2oFcLum34Bq7giFXTBd5AcRywKOjUs44uozQ';
     const url = `https://docs.google.com/spreadsheets/d/e/2PACX-1vSqMpZdzLDdyKl1HqHtx4t_UUpJx6F7I4JhOGD5JhSyMFq9xY11Psl-HFrpPMBZzKh1efH074NOlz5B/pub?gid=1466103352&single=true&output=csv`;
 
     try {
         const res = await fetch(url);
-        const data = await res.text();
+        const csvText = await res.text();
 
-        // CSV Parsing logic
-        const rows = data.split('\n').map(row => row.split(',').map(cell => cell.replace(/^"(.*)"$/, '$1').trim()));
-        const headers = rows[0];
+        // 1. Split rows and clean hidden characters (\r) from every cell
+        const rows = csvText.split(/\r?\n/).map(row => 
+            row.split(',').map(cell => cell.replace(/^"(.*)"$/, '$1').trim())
+        );
 
+        // 2. Sanitize Headers specifically (removes any remaining hidden junk)
+        const headers = rows[0].map(h => h.replace(/[\r\n]/g, '').trim());
+
+        // 3. Build allTeams objects
         allTeams = rows.slice(1).map(row => {
             let obj = {};
-            row.forEach((val, i) => obj[headers[i]] = val);
+            row.forEach((val, i) => {
+                if (headers[i]) obj[headers[i]] = val;
+            });
             return obj;
         }).filter(item => item.draftMaster === master);
+
+        console.log("Verified Headers:", headers); // Check your console to see if LogoURL is there
+        console.log("First Team Data:", allTeams[0]); // Check if logoURL has a value
 
         renderAll();
     } catch (err) {
         console.error("Load Error:", err);
-        dMast.textContent = "Error Loading Sheet - Is it Published to Web?";
+        dMast.textContent = "Error Loading Sheet";
     }
 });
 
