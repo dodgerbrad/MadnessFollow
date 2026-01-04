@@ -1,38 +1,88 @@
 let allTeams = [];
 
-// Replace with your New Deployment Web App URL
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyDAer6siT5ACM2vF2j1rJX3Gax0_b_sQeMZ8XGm_qY_uCYF5RmFX1YkzU9BbpknQOVKw/exec';
+
 
 
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const loader = document.getElementById('loader-overlay');
+    // 1. SELECT UI ELEMENTS
     const dMast = document.getElementById('dMast');
+    const loader = document.getElementById('loader-overlay');
+
+    // 2. CAPTURE URL PARAMETERS (The 'Source of Truth')
     const urlParams = new URLSearchParams(window.location.search);
     const master = urlParams.get('master') || "Default";
-    dMast.textContent = `${master}'s Draft`;
 
-    const url = `${SCRIPT_URL}?action=getDraftData`;
+    // 3. UPDATE UI HEADER
+    if (dMast) {
+        dMast.textContent = `${master}'s Draft`;
+    }
+
+    // 4. INJECT DYNAMIC MANIFEST (For Mobile "Add to Home Screen" Personalization)
+    // 1. Get the exact base path for your local server
+    // This works whether your URL is http://localhost:8080/index.html or http://localhost/project/index.html
+    // Clean the current URL to remove any existing junk
+    const currentFullURL = new URL(window.location.href);
+    // Explicitly set the master parameter for the home screen launch
+    currentFullURL.searchParams.set('master', master);
+
+    const dynamicManifest = {
+        "short_name": `Draft-${master}`,
+        "name": `${master}'s 2026 Draft Board`,
+        "start_url": currentFullURL.toString(), // Uses the full, explicit URL
+        "display": "standalone",
+        "background_color": "#0d1117",
+        "theme_color": "#58a6ff",
+        "icons": [
+            { "src": `${baseUrl}2026 Logo.png`, "sizes": "192x192", "type": "image/png" },
+            { "src": `${baseUrl}2026 Logo.png`, "sizes": "512x512", "type": "image/png" }
+        ]
+    };
+    const stringManifest = JSON.stringify(dynamicManifest);
+    const blob = new Blob([stringManifest], { type: 'application/json' });
+    const manifestURL = URL.createObjectURL(blob);
+    const link = document.createElement('link');
+    link.rel = 'manifest';
+    link.href = manifestURL;
+    document.head.appendChild(link);
+
+    // 5. FETCH DATA FROM GOOGLE APPS SCRIPT
+    // Replace the URL with your current Web App URL
+    // Replace with your New Deployment Web App URL
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyDAer6siT5ACM2vF2j1rJX3Gax0_b_sQeMZ8XGm_qY_uCYF5RmFX1YkzU9BbpknQOVKw/exec';
+    const fetchUrl = `${SCRIPT_URL}?action=getDraftData&t=${Date.now()}`;
 
     try {
-        const res = await fetch(url);
+        const res = await fetch(fetchUrl);
+        if (!res.ok) throw new Error('Network response was not ok');
+
         const jsonData = await res.json();
 
+        // Filter all rows by the master name captured in Step 2
+        // We use lowercase comparison to prevent typos from breaking the board
         allTeams = jsonData.filter(item =>
             String(item.draftMaster).trim().toLowerCase() === master.toLowerCase()
         );
 
+        console.log(`Successfully loaded ${allTeams.length} rows for ${master}`);
+
+        // 6. RENDER THE TABLES
         renderAll();
+
     } catch (err) {
-        console.error("Load Error:", err);
+        console.error("Critical Load Error:", err);
+        if (dMast) dMast.textContent = "Error Loading Draft Data";
     } finally {
-        // HIDE LOADER: Fade out and then remove
-        loader.style.opacity = '0';
-        setTimeout(() => {
-            loader.style.display = 'none';
-        }, 500); // Matches the 0.5s CSS transition
+        // 7. HIDE THE LOADING OVERLAY
+        if (loader) {
+            loader.style.opacity = '0';
+            setTimeout(() => {
+                loader.style.display = 'none';
+            }, 500);
+        }
     }
 });
+
 
 function renderAll() {
     renderLog();
