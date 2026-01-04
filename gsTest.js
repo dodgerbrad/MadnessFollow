@@ -1,7 +1,7 @@
 let allTeams = [];
 
 // Replace with your New Deployment Web App URL
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxA8wKm4QjiRZ9GJvkd63RxoPsAv4QO7bvD6cKrERALy2eJungpU6Wp8EZlm_bdxG0_qg/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyDAer6siT5ACM2vF2j1rJX3Gax0_b_sQeMZ8XGm_qY_uCYF5RmFX1YkzU9BbpknQOVKw/exec';
 
 
 
