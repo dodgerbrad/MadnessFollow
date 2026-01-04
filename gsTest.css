@@ -1,122 +1,91 @@
-* {
-
-    box-sizing: border-box;
-  }
-
-  body {
-
-    background-color: black;
-  }
-
-  th,
-  table,
-  td {
-
-    border: 2px solid black;
-    text-align: center;
-    padding: 10px 20px;
-  }
-
-  table {
-    background-color: red;
-    margin-left: auto;
-    margin-right: auto;
-    border-radius: 12px;
-
-  }
-
- 
-
-  tr {
-
-    background-color: white;
-  }
-
-  th {
-    background-color: grey;
-    width: auto;
-
-
-  }
-
-  
-
-  h1,
-  h2 {
-
-    text-align: center;
-    color: white;
-
-
-  }
-
-  button {
-
-    font-size: 20px;
-    padding: 5px 10px;
-    border-radius: 8px;
-    margin-left: 25%;
-    border: 2px solid grey;
-  }
-  button:enabled:active {
-  
-  transform: translateY(4px);
+body {
+  background-color: #0d1117;
+  color: #e6edf3;
+  font-family: -apple-system, system-ui, sans-serif;
+  margin: 0;
+  padding: 15px;
+  -webkit-font-smoothing: antialiased;
 }
 
-  img {
-    border-radius: 50px;
-    border: 10px solid orangered;
+h2, h3 { text-align: center; color: #58a6ff; }
+
+.mobile-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+#playerSearch {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #30363d;
+  background: #161b22;
+  color: white;
+  margin-bottom: 20px;
+  font-size: 16px; /* Prevents iPhone auto-zoom on focus */
+}
+
+.table-card {
+  background: #161b22;
+  border-radius: 12px;
+  padding: 10px;
+  margin-bottom: 20px;
+  border: 1px solid #30363d;
+}
+
+.scroll-x {
+  overflow-x: auto; /* Allows swiping on small screens */
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+th {
+  border-bottom: 2px solid #30363d;
+  padding: 10px;
+  color: #8b949e;
+}
+
+td {
+  padding: 12px 8px;
+  border-bottom: 1px solid #21262d;
+  text-align: center;
+}
+
+/* Status Colors */
+.status-in { color: #3fb950; font-weight: bold; }
+.status-out { color: #f85149; }
+
+.logo {
+  display: block;
+  margin: 20px auto;
+  width: clamp(100px, 20vw, 150px); /* Responsive width */
+  border-radius: 50%;
+  /* Keep existing border styles if you like */
+}
+/* Container for the logo and text */
+.player-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Center horizontally for desktop */
+  gap: 10px; /* Space between logo and name */
+}
+
+/* Specific styling for the logo icon */
+.player-logo {
+  width: 24px;
+  height: 24px;
+  object-fit: contain; /* Prevents stretching */
+  border-radius: 4px; /* Optional slight rounding */
+  flex-shrink: 0; /* Prevents logo from squishing */
+}
+
+/* Mobile-specific adjustment */
+@media (max-width: 600px) {
+  .player-cell {
+      justify-content: flex-start; /* Align left in mobile card view */
   }
-
-  #playerSearch {
-    background-image: url('https://www.w3schools.com/css/searchicon.png');
-    background-position: 10px 10px;
-    background-repeat: no-repeat;
-
-    width: 25%;
-    margin: auto;
-    display: block;
-    font-size: 16px;
-    padding: 12px 20px 12px 40px;
-    border: 1px solid #ddd;
-    margin-bottom: 12px;
-  }
-
-  td {
-
-    width: auto;
-  }
-
-  label{
-
-    color: white;
-  }
-
-  table {
-    background-color: red;
-    margin: 20px auto;
-    border-radius: 12px;
-    width: 70%; /* Changed from 100% to look better on desktops */
-    border-collapse: collapse; /* Essential for 2025 table layouts */
-    overflow: hidden;
-  }
-  
-  th {
-    background-color: grey;
-    color: white;
-  }
-  
-  tr {
-    background-color: white;
-  }
-  
-  /* Optional: Make the Rank column slightly narrower on both tables */
-  td:first-child, th:first-child {
-    width: 80px;
-  }
-
-  
-
-
-
- 
+}

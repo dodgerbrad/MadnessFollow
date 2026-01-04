@@ -1,123 +1,121 @@
 let allTeams = [];
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const dMastElement = document.getElementById('dMast');
-    if (!dMastElement) return;
-
+    const dMast = document.getElementById('dMast');
     const urlParams = new URLSearchParams(window.location.search);
-    const masterFromUrl = urlParams.get('master');
+    const master = urlParams.get('master') || "Default";
 
-    if (masterFromUrl) {
-        dMastElement.dataset.master = masterFromUrl;
-        dMastElement.textContent = `${masterFromUrl}'s Draft`;
-    }
+    dMast.textContent = `${master}'s Draft`;
 
-    const masterValue = dMastElement.dataset.master; 
+    // REPLACE THIS with your actual Published CSV link
     const SHEET_ID = '1pLOuB4Z2oFcLum34Bq7giFXTBd5AcRywKOjUs44uozQ';
-
-    // MUST start with https:// and use ${ } for the variable
-    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Change`;
-    
-
+    const url = `https://docs.google.com/spreadsheets/d/e/2PACX-1vSqMpZdzLDdyKl1HqHtx4t_UUpJx6F7I4JhOGD5JhSyMFq9xY11Psl-HFrpPMBZzKh1efH074NOlz5B/pub?gid=1466103352&single=true&output=csv`;
 
     try {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error("Google Sheet not found.");
-        
-        const csvText = await response.text();
-        const rows = csvText.split(/\r?\n/).map(row => row.split(','));
-        const cleanRows = rows.map(row => row.map(cell => cell.replace(/^"(.*)"$/, '$1').trim()));
-        
-        const headers = cleanRows[0]; 
-        const rawData = cleanRows.slice(1).map(row => {
-            let obj = {};
-            row.forEach((cell, i) => { if (headers[i]) obj[headers[i]] = cell; });
-            return obj;
-        });
+        const res = await fetch(url);
+        const data = await res.text();
 
-        allTeams = rawData.filter(item => item.draftMaster === masterValue);
-        
-        // These calls will work because function declarations are hoisted
-        renderTable(allTeams);
-        renderLeaderboard();
-    } catch (error) {
-        console.error('Error fetching from Google Sheets:', error);
+        // CSV Parsing logic
+        const rows = data.split('\n').map(row => row.split(',').map(cell => cell.replace(/^"(.*)"$/, '$1').trim()));
+        const headers = rows[0];
+
+        allTeams = rows.slice(1).map(row => {
+            let obj = {};
+            row.forEach((val, i) => obj[headers[i]] = val);
+            return obj;
+        }).filter(item => item.draftMaster === master);
+
+        renderAll();
+    } catch (err) {
+        console.error("Load Error:", err);
+        dMast.textContent = "Error Loading Sheet - Is it Published to Web?";
     }
 });
 
-// --- HELPER FUNCTIONS ---
-
-function renderTable(dataArray) {
-    const tbody = document.getElementById('tableBody');
-    if (!tbody) return;
-    tbody.innerHTML = ""; 
-
-    const logRankRef = [...new Set(allTeams.map(t => parseFloat(t.Pts) || 0))].sort((a, b) => b - a);
-
-    dataArray.forEach(item => {
-        const row = document.createElement('tr');
-        const pts = parseFloat(item.Pts) || 0;
-        const rank = (item.Pts === "-") ? "-" : (logRankRef.indexOf(pts) + 1);
-
-        row.innerHTML = `
-            <td>${item.player || 'N/A'}</td>
-            <td>${item.order || '-'}</td>
-            <td>${item.pick || '-'}</td>
-            <td>${item.Pts}</td>
-            <td>${rank}</td>
-            <td>${item.Done}</td>
-        `;
-        tbody.appendChild(row);
-    });
+function renderAll() {
+    renderLog();
+    renderStandings();
 }
 
-function renderLeaderboard() {
-    const lbody = document.getElementById('leaderboardBody');
-    if (!lbody) return;
-    lbody.innerHTML = "";
+function renderLog() {
+    const body = document.getElementById('tableBody');
+    const allScores = allTeams.map(t => parseFloat(t.Pts) || 0).sort((a, b) => b - a);
 
-    const getNumericPts = (item) => {
-        const val = parseFloat(item.Pts || item.pts); 
-        return isNaN(val) ? 0 : val;
-    };
+    body.innerHTML = allTeams.map(item => {
+        const currentPts = parseFloat(item.Pts) || 0;
+        const calculatedRank = allScores.indexOf(currentPts) + 1;
 
-    // Grouping logic to count 'In' status for 'Plys Left'
-    const teamStats = allTeams.reduce((acc, item) => {
-        const name = item.player || 'N/A';
-        if (!acc[name]) acc[name] = { totalPts: 0, plysLeft: 0 };
+        // The Fix: If LogoURL is missing, it shows a generic sports icon
+        // Correcting the variable and adding the full https:// protocol
+        const imgUrl = (item.LogoURL && item.LogoURL.trim() !== "")
+            ? item.LogoURL
+            : "cdn-icons-png.flaticon.com"; // Full URL required
 
-        acc[name].totalPts += getNumericPts(item);
-        
-        // Logic: Increment counter if the player's status is "In"
-        if (item.Done === "In") {
-            acc[name].plysLeft += 1;
-        }
+
+        return `
+            <tr>
+                <td data-label="Team">${item.player}</td>
+                <td data-label="#">${item.order}</td>
+                <td data-label="Player">
+                    <div class="player-cell">
+                        <img src="${imgUrl}" alt="" class="player-logo">
+                        <span>${item.pick}</span>
+                    </div>
+                </td>
+                <td data-label="Pts" style="color:#58a6ff">${item.Pts}</td>
+                <td data-label="Rank">${calculatedRank}</td>
+                <td data-label="Status" class="status-${item.Done?.toLowerCase()}">${item.Done}</td>
+            </tr>
+        `;
+    }).join('');
+}
+
+
+
+function renderStandings() {
+    const body = document.getElementById('leaderboardBody');
+    if (!body) return;
+
+    // 1. Aggregate stats
+    const stats = allTeams.reduce((acc, teamRow) => {
+        const teamName = teamRow.player || 'Unknown';
+        if (!acc[teamName]) acc[teamName] = { pts: 0, left: 0 };
+        acc[teamName].pts += parseFloat(teamRow.Pts) || 0;
+        if (teamRow.Done === "In") acc[teamName].left++;
         return acc;
     }, {});
 
-    const sorted = Object.entries(teamStats).sort((a, b) => b[1].totalPts - a[1].totalPts);
-    const uniqueScores = [...new Set(sorted.map(s => s[1].totalPts))].sort((a, b) => b - a);
-    const leaderScore = sorted.length > 0 ? sorted[0][1].totalPts : 0;
+    // 2. Sort teams by points descending
+    const sortedTeams = Object.entries(stats).sort((a, b) => b[1].pts - a[1].pts);
 
-    sorted.forEach(([name, stats]) => {
-        const rank = stats.totalPts === 0 ? "-" : (uniqueScores.indexOf(stats.totalPts) + 1);
-        const pointsBack = stats.totalPts === 0 ? "-" : Math.round(leaderScore - stats.totalPts);
+    // 3. Create a reference list of total scores for ranking ties
+    const totalScoresList = sortedTeams.map(t => t[1].pts);
+    const topScore = totalScoresList[0] || 0;
 
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${rank}</td>
-            <td>${name}</td>
-            <td>${stats.totalPts}</td>
-            <td>${pointsBack}</td>
-            <td>${stats.plysLeft}</td>
+    // 4. Render the rows (The fix is using [name, teamData] instead of 'item')
+    body.innerHTML = sortedTeams.map(([name, teamData]) => {
+        const overallRank = totalScoresList.indexOf(teamData.pts) + 1;
+
+        return `
+            <tr>
+                <td data-label="Rank">${overallRank}</td>
+                <td data-label="Team">${name}</td>
+                <td data-label="Total">${teamData.pts}</td>
+                <td data-label="Back">${Math.round(topScore - teamData.pts)}</td>
+                <td data-label="Left">${teamData.left}</td>
+            </tr>
         `;
-        lbody.appendChild(row);
-    });
+    }).join('');
 }
 
+
+
 function filterTable() {
-    const searchTerm = document.getElementById('playerSearch').value.toLowerCase();
-    const filteredData = allTeams.filter(item => (item.player || "").toLowerCase().includes(searchTerm));
-    renderTable(filteredData);
-    renderLeaderboard();
+    const q = document.getElementById('playerSearch').value.toLowerCase();
+    const filtered = allTeams.filter(t => t.player.toLowerCase().includes(q));
+    // Temporary override of global data for the log view
+    const original = allTeams;
+    allTeams = filtered;
+    renderLog();
+    allTeams = original;
 }
