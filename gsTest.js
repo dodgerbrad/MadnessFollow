@@ -39,18 +39,28 @@ function renderAll() {
 
 function renderLog() {
     const body = document.getElementById('tableBody');
+    if (!body) return; // Safety check
+
+    // 1. Calculate ranks based on current points
     const allScores = allTeams.map(t => parseFloat(t.Pts) || 0).sort((a, b) => b - a);
 
+    // 2. Map through data to create rows
     body.innerHTML = allTeams.map(item => {
         const currentPts = parseFloat(item.Pts) || 0;
         const calculatedRank = allScores.indexOf(currentPts) + 1;
 
-        // The Fix: If LogoURL is missing, it shows a generic sports icon
-        // Correcting the variable and adding the full https:// protocol
-        const imgUrl = (item.LogoURL && item.LogoURL.trim() !== "")
-            ? item.LogoURL
-            : "cdn-icons-png.flaticon.com"; // Full URL required
-
+        /**
+         * LOGO LOGIC FOR GITHUB:
+         * 1. If LogoURL starts with "http", use it directly (External Link).
+         * 2. If it's a path like "logos/team.png", it adds "./" (Local GitHub Folder).
+         * 3. If empty, it uses your "2026 Logo.png" as a fallback.
+         */
+        let playerLogo;
+        if (item.LogoURL && item.LogoURL.trim() !== "") {
+            playerLogo = item.LogoURL.startsWith('http') ? item.LogoURL : `./${item.LogoURL}`;
+        } else {
+            playerLogo = "./2026 Logo.png";
+        }
 
         return `
             <tr>
@@ -58,7 +68,7 @@ function renderLog() {
                 <td data-label="#">${item.order}</td>
                 <td data-label="Player">
                     <div class="player-cell">
-                        <img src="${imgUrl}" alt="" class="player-logo">
+                        <img src="${playerLogo}" class="player-logo" alt="" onerror="this.src='./2026 Logo.png';">
                         <span>${item.pick}</span>
                     </div>
                 </td>
