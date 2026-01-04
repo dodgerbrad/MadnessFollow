@@ -157,3 +157,8 @@ td {
   text-transform: uppercase;
   font-size: 0.8rem;
 }
+
+body {
+    /* Enables the native pull-to-refresh behavior in most 2026 mobile browsers */
+    overscroll-behavior-y: contain; 
+}
