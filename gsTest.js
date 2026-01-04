@@ -1,40 +1,28 @@
 let allTeams = [];
 
+// Replace with your New Deployment Web App URL
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxA8wKm4QjiRZ9GJvkd63RxoPsAv4QO7bvD6cKrERALy2eJungpU6Wp8EZlm_bdxG0_qg/exec';
+
 document.addEventListener('DOMContentLoaded', async () => {
     const dMast = document.getElementById('dMast');
     const urlParams = new URLSearchParams(window.location.search);
     const master = urlParams.get('master') || "Default";
-
     dMast.textContent = `${master}'s Draft`;
 
-    // MUST start with https:// and end with a cache-buster for 2026
-    const url = `https://docs.google.com/spreadsheets/d/e/2PACX-1vSqMpZdzLDdyKl1HqHtx4t_UUpJx6F7I4JhOGD5JhSyMFq9xY11Psl-HFrpPMBZzKh1efH074NOlz5B/pub?gid=0&single=true&output=csv`;
+    // Fetch JSON directly from your script
+    const url = `${SCRIPT_URL}?action=getDraftData`;
 
     try {
         const res = await fetch(url);
-        const csvText = await res.text();
+        const jsonData = await res.json(); // Direct JSON parsing
 
-        // Split by line, then clean each cell of quotes and hidden characters
-        const allRows = csvText.split(/\r?\n/).filter(row => row.trim() !== "");
-        const rows = allRows.map(row => row.split(',').map(cell => cell.replace(/^"(.*)"$/, '$1').trim()));
+        // Filter by the master from the URL
+        allTeams = jsonData.filter(item => item.draftMaster === master);
 
-        // SANITIZE HEADERS: This fixes the "8 headers" issue by removing hidden characters
-        const headers = rows[0].map(h => h.replace(/[\r\n]/g, '').trim());
-        console.log("Final Sanity Check - Headers found:", headers);
-
-        allTeams = rows.slice(1).map(row => {
-            let obj = {};
-            row.forEach((val, i) => {
-                if (headers[i]) obj[headers[i]] = val;
-            });
-            return obj;
-        }).filter(item => item.draftMaster === master);
-
-        console.log("Teams Loaded:", allTeams.length);
         renderAll();
     } catch (err) {
-        console.error("Critical Load Error:", err);
-        dMast.textContent = "Error Loading Sheet Data";
+        console.error("JSON Load Error:", err);
+        dMast.textContent = "Error Loading Data via API";
     }
 });
 
