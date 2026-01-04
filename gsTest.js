@@ -1,6 +1,9 @@
 let allTeams = [];
 
-
+document.getElementById('homeLogo').addEventListener('click', () => {
+    // 2026 Standard: Simple reload
+    window.location.reload();
+});
 
 
 
@@ -46,8 +49,8 @@ const dynamicManifest = {
     "background_color": "#0d1117",
     "theme_color": "#58a6ff",
     "icons": [
-        { "src": `${baseUrl}2026 Logo.png`, "sizes": "192x192", "type": "image/png" },
-        { "src": `${baseUrl}2026 Logo.png`, "sizes": "512x512", "type": "image/png" }
+        { "src": `${baseUrl}Madness.png`, "sizes": "192x192", "type": "image/png" },
+        { "src": `${baseUrl}Madness.png`, "sizes": "512x512", "type": "image/png" }
     ]
 };
 

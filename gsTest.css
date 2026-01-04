@@ -5,14 +5,26 @@ body {
   margin: 0;
   padding: 15px;
   -webkit-font-smoothing: antialiased;
-  overscroll-behavior-y: contain; 
 }
 
-h2,
+
 h3 {
   text-align: center;
   color: #58a6ff;
 }
+h1 {
+  font-size: 1.8rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #ffffff;
+  text-shadow: 0 0 10px rgba(88, 166, 255, 0.5); /* Blue neon glow */
+  border-bottom: 2px solid;
+  border-image: linear-gradient(to right, #58a6ff, transparent) 1;
+  padding-bottom: 10px;
+  margin: 30px auto 20px;
+  text-align: center;
+}
+
 
 .mobile-container {
   max-width: 800px;
@@ -157,9 +169,4 @@ td {
   letter-spacing: 1px;
   text-transform: uppercase;
   font-size: 0.8rem;
-}
-
-body {
-    /* Enables the native pull-to-refresh behavior in most 2026 mobile browsers */
-    overscroll-behavior-y: contain; 
 }
