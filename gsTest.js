@@ -24,6 +24,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (err) {
         console.error("Load Error:", err);
     }
+    try {
+        const res = await fetch(url);
+        const jsonData = await res.json();
+        
+        // CRITICAL: Filter data immediately so other functions only see this master's picks
+        allTeams = jsonData.filter(item => 
+            String(item.draftMaster).trim().toLowerCase() === master.toLowerCase()
+        );
+        
+        renderAll();
+    } catch (err) {
+        console.error("Load Error:", err);
+    }
 });
 
 function renderAll() {
@@ -69,29 +82,42 @@ function renderStandings() {
     const body = document.getElementById('leaderboardBody');
     if (!body) return;
 
+    // 1. Group rows by player/team name and sum points
     const stats = allTeams.reduce((acc, row) => {
-        const team = row.player || 'Unknown';
-        if (!acc[team]) acc[team] = { pts: 0, left: 0 };
-        acc[team].pts += parseFloat(row.Pts) || 0;
-        if (row.Done === "In") acc[team].left++;
+        const teamName = row.player || 'Unknown';
+        if (!acc[teamName]) acc[teamName] = { pts: 0, left: 0 };
+        acc[teamName].pts += parseFloat(row.Pts) || 0;
+        if (row.Done === "In") acc[teamName].left++;
         return acc;
     }, {});
 
-    const sorted = Object.entries(stats).sort((a, b) => b[1].pts - a[1].pts);
-    const topScore = sorted.length > 0 ? sorted[0][1].pts : 0;
+    // 2. Sort by total points (Descending)
+    const sortedTeams = Object.entries(stats)
+        .map(([name, data]) => ({ name, ...data }))
+        .sort((a, b) => b.pts - a.pts);
 
-    body.innerHTML = sorted.map(([name, data], i) => {
+    // 3. Generate reference list of scores for tie-handling
+    const scoreList = sortedTeams.map(t => t.pts);
+    const topScore = scoreList[0] || 0;
+
+    // 4. Render with competition ranking
+    body.innerHTML = sortedTeams.map(team => {
+        // Standard competition rank: finds first occurrence of this score
+        const rank = scoreList.indexOf(team.pts) + 1;
+        const ptsBack = Math.round(topScore - team.pts);
+
         return `
             <tr>
-                <td data-label="Rank">${i + 1}</td>
-                <td data-label="Team">${name}</td>
-                <td data-label="Total">${data.pts}</td>
-                <td data-label="Back">${Math.round(topScore - data.pts)}</td>
-                <td data-label="Left">${data.left}</td>
+                <td data-label="Rank">${rank}</td>
+                <td data-label="Team">${team.name}</td>
+                <td data-label="Total">${team.pts.toFixed(1)}</td>
+                <td data-label="Back">${ptsBack}</td>
+                <td data-label="Left">${team.left}</td>
             </tr>
         `;
     }).join('');
 }
+
 
 function filterTable() {
     const q = document.getElementById('playerSearch').value.toLowerCase();
