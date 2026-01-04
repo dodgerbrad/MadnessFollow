@@ -25,6 +25,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const currentFullURL = new URL(window.location.href);
     // Explicitly set the master parameter for the home screen launch
     currentFullURL.searchParams.set('master', master);
+    const baseUrl = currentFullURL.origin + currentFullURL.pathname.substring(0, currentFullURL.pathname.lastIndexOf('/') + 1);
 
     const dynamicManifest = {
         "short_name": `Draft-${master}`,
