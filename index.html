@@ -28,9 +28,31 @@
 
     <div class="mobile-container">
         <h1>Madness 2026</h1>
-        <input type="text" id="playerSearch" placeholder="🔍 Search teams..." onkeyup="filterTable()">
-
+        
         <div class="table-card">
+            <h3>Total Standings</h3>
+            <div class="scroll-x">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Team</th>
+                            <th>Total</th>
+                            <th>Back</th>
+                            <th>Left</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboardBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <br>
+        
+        <input type="text" id="playerSearch" placeholder="🔍 Search teams..." onkeyup="filterTable()">
+        
+        <div class="table-card">
+            
             <h3>Team Draft Log</h3>
             <div class="scroll-x">
                 <table>
@@ -49,23 +71,7 @@
             </div>
         </div>
 
-        <div class="table-card">
-            <h3>Total Standings</h3>
-            <div class="scroll-x">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Rank</th>
-                            <th>Team</th>
-                            <th>Total</th>
-                            <th>Back</th>
-                            <th>Left</th>
-                        </tr>
-                    </thead>
-                    <tbody id="leaderboardBody"></tbody>
-                </table>
-            </div>
-        </div>
+        
     </div>
     <script src="gsTest.js"></script>
 </body>
