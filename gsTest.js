@@ -6,6 +6,7 @@ const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyDAer6siT5ACM2vF2j1
 
 
 document.addEventListener('DOMContentLoaded', async () => {
+    const loader = document.getElementById('loader-overlay');
     const dMast = document.getElementById('dMast');
     const urlParams = new URLSearchParams(window.location.search);
     const master = urlParams.get('master') || "Default";
@@ -16,26 +17,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         const res = await fetch(url);
         const jsonData = await res.json();
-        
-        // Filter by draftMaster (Case sensitive to your Sheet header)
-        allTeams = jsonData.filter(item => item.draftMaster === master);
-        
-        renderAll();
-    } catch (err) {
-        console.error("Load Error:", err);
-    }
-    try {
-        const res = await fetch(url);
-        const jsonData = await res.json();
-        
-        // CRITICAL: Filter data immediately so other functions only see this master's picks
-        allTeams = jsonData.filter(item => 
+
+        allTeams = jsonData.filter(item =>
             String(item.draftMaster).trim().toLowerCase() === master.toLowerCase()
         );
-        
+
         renderAll();
     } catch (err) {
         console.error("Load Error:", err);
+    } finally {
+        // HIDE LOADER: Fade out and then remove
+        loader.style.opacity = '0';
+        setTimeout(() => {
+            loader.style.display = 'none';
+        }, 500); // Matches the 0.5s CSS transition
     }
 });
 
@@ -56,7 +51,7 @@ function renderLog() {
         const calculatedRank = allScores.indexOf(currentPts) + 1;
 
         // Smart logo logic: checks for external URL or local path
-        let playerLogo = (item.LogoURL && item.LogoURL.toString().trim() !== "") 
+        let playerLogo = (item.LogoURL && item.LogoURL.toString().trim() !== "")
             ? (item.LogoURL.startsWith('http') ? item.LogoURL : `./${item.LogoURL}`)
             : "./2026 Logo.png";
 

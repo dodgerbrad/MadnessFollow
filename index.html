@@ -1,20 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="manifest" href="./manifest.json">
+    <!-- iOS Specific Tags for 2026 -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="./Madness.png">
+
     <title>2026 Draft Board</title>
     <link rel="stylesheet" href="gsTest.css">
-    <link rel="icon" type="image/png" href="./2026 Logo.png">
+    <link rel="icon" type="image/png" href="./Madness.png">
 
     <img src="Madness.png" alt="2026 Logo" class="logo">
 </head>
+
 <body>
     <h2 id="dMast" data-master="Default">Loading Draft...</h2>
-    
+    <!-- Modern 2026 Loading Overlay -->
+    <div id="loader-overlay">
+        <div class="spinner"></div>
+        <p>Retrieving 2026 Draft Data...</p>
+    </div>
+
     <div class="mobile-container">
         <input type="text" id="playerSearch" placeholder="🔍 Search teams..." onkeyup="filterTable()">
-        
+
         <div class="table-card">
             <h3>Team Draft Log</h3>
             <div class="scroll-x">
@@ -54,4 +67,5 @@
     </div>
     <script src="gsTest.js"></script>
 </body>
+
 </html>

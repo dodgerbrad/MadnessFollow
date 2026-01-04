@@ -7,7 +7,11 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-h2, h3 { text-align: center; color: #58a6ff; }
+h2,
+h3 {
+  text-align: center;
+  color: #58a6ff;
+}
 
 .mobile-container {
   max-width: 800px;
@@ -22,7 +26,8 @@ h2, h3 { text-align: center; color: #58a6ff; }
   background: #161b22;
   color: white;
   margin-bottom: 20px;
-  font-size: 16px; /* Prevents iPhone auto-zoom on focus */
+  font-size: 16px;
+  /* Prevents iPhone auto-zoom on focus */
 }
 
 .table-card {
@@ -34,7 +39,8 @@ h2, h3 { text-align: center; color: #58a6ff; }
 }
 
 .scroll-x {
-  overflow-x: auto; /* Allows swiping on small screens */
+  overflow-x: auto;
+  /* Allows swiping on small screens */
 }
 
 table {
@@ -56,36 +62,98 @@ td {
 }
 
 /* Status Colors */
-.status-in { color: #3fb950; font-weight: bold; }
-.status-out { color: #f85149; }
+.status-in {
+  color: #3fb950;
+  font-weight: bold;
+}
+
+.status-out {
+  color: #f85149;
+}
 
 .logo {
   display: block;
   margin: 20px auto;
-  width: clamp(100px, 20vw, 150px); /* Responsive width */
+  width: clamp(100px, 20vw, 150px);
+  /* Responsive width */
   border-radius: 50%;
   /* Keep existing border styles if you like */
 }
+
 /* Container for the logo and text */
 .player-cell {
   display: flex;
   align-items: center;
-  justify-content: center; /* Center horizontally for desktop */
-  gap: 10px; /* Space between logo and name */
+  justify-content: center;
+  /* Center horizontally for desktop */
+  gap: 10px;
+  /* Space between logo and name */
 }
 
 /* Specific styling for the logo icon */
 .player-logo {
   width: 24px;
   height: 24px;
-  object-fit: contain; /* Prevents stretching */
-  border-radius: 4px; /* Optional slight rounding */
-  flex-shrink: 0; /* Prevents logo from squishing */
+  object-fit: contain;
+  /* Prevents stretching */
+  border-radius: 4px;
+  /* Optional slight rounding */
+  flex-shrink: 0;
+  /* Prevents logo from squishing */
 }
 
 /* Mobile-specific adjustment */
 @media (max-width: 600px) {
   .player-cell {
-      justify-content: flex-start; /* Align left in mobile card view */
+    justify-content: flex-start;
+    /* Align left in mobile card view */
   }
+}
+
+/* Full-screen Loading Overlay */
+#loader-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #0d1117;
+  /* Matches your dark theme */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  /* Keeps it on top of everything */
+  transition: opacity 0.5s ease;
+}
+
+/* 2026 Neon Spinner Style */
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(88, 166, 255, 0.1);
+  border-top: 5px solid #58a6ff;
+  /* Sky blue accent */
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 15px;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+#loader-overlay p {
+  color: #58a6ff;
+  font-family: sans-serif;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-size: 0.8rem;
 }
