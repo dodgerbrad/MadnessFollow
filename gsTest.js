@@ -134,7 +134,7 @@ function renderStandings() {
     const stats = allTeams.reduce((acc, row) => {
         const teamName = row.player || 'Unknown';
         if (!acc[teamName]) acc[teamName] = { pts: 0, left: 0 };
-        acc[teamName].pts += parseFloat(row.Pts) || 0;
+        acc[teamName].pts += parseInt(row.Pts) || 0;
         if (row.Done === "In") acc[teamName].left++;
         return acc;
     }, {});
@@ -158,7 +158,7 @@ function renderStandings() {
             <tr>
                 <td data-label="Rank">${rank}</td>
                 <td data-label="Team">${team.name}</td>
-                <td data-label="Total">${team.pts.toFixed(1)}</td>
+                <td data-label="Total">${team.pts}</td>
                 <td data-label="Back">${ptsBack}</td>
                 <td data-label="Left">${team.left}</td>
             </tr>
