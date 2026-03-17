@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Attach a permanent 'staticRank' to every item
         allTeams = masterData.map(item => {
-            const pts = parseFloat(item.Pts) || 0;
+            const pts = parseInt(item.Pts) || 0;
             return {
                 ...item,
                 staticRank: masterScores.indexOf(pts) + 1
