@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         );
 
         // Calculate Ranks ONCE based on this master's full list
-        const masterScores = masterData.map(t => parseFloat(t.Pts) || 0).sort((a, b) => b - a);
+        const masterScores = masterData.map(t => parseInt(t.Pts) || 0).sort((a, b) => b - a);
 
         // Attach a permanent 'staticRank' to every item
         allTeams = masterData.map(item => {
